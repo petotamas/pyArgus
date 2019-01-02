@@ -10,17 +10,11 @@ Demonstration functions written to test the radPatternPlot function proper
 operation.
 
 Tamás Pető
-21, april 2014
+21, april 2017
 
 """
-import os
-import sys
-pyargus_root_path = os.path.dirname(os.getcwd())
-pyargus_path = os.path.join(pyargus_root_path, "pyArgus")
-sys.path.insert(0, pyargus_path)
-
 import numpy as np
-from antennaArrayPattern import array_rad_pattern_plot
+from pyargus.antennaArrayPattern import array_rad_pattern_plot
 
 def demo_ULA_plot(N=4, d=0.5, theta=90):
     """
@@ -39,7 +33,7 @@ def demo_ULA_plot(N=4, d=0.5, theta=90):
 
     # Main beam positioning for ULA
     for i in np.arange(0,N,1):
-         w[i] = np.exp(-i* 1j* 2*np.pi * d *np.cos(np.deg2rad(theta)))          
+         w[i] = np.exp(i* 1j* 2*np.pi * d *np.cos(np.deg2rad(theta)))          
     
     # Manual override coefficients
     # W     = np.array([1,-1,1,-1],dtype = complex)
@@ -68,7 +62,7 @@ def demo_UCA_plot(N=4 , r=1, theta=90):
 
     # Main beam positioning for UCA
     for i in np.arange(0,N,1):   
-         w[i] = np.exp(-1j*2*np.pi*r*np.cos(np.radians(theta-i*(360)/N))) # UCA   
+         w[i] = np.exp(1j*2*np.pi*r*np.cos(np.radians(theta-i*(360)/N))) # UCA   
    
     # Antenna elemnt positions for UCA
     x_coords = np.zeros(N)
@@ -79,5 +73,4 @@ def demo_UCA_plot(N=4 , r=1, theta=90):
     array_alignment = np.array((x_coords, y_coords))
     
     array_rad_pattern_plot(w=w, array_alignment = array_alignment)
-    
 
