@@ -12,18 +12,7 @@ import matplotlib.pyplot as plt
 
 
     Authors: Pető Tamás
-
     License: GPLv3
-
-    Changelog :
-        - Ver 1.0000   : Initial version (2015 07 13)
-        - Ver 1.0100   : Weight coefficients can be set externally (2015 08 07)
-        - Ver 1.0200   : Input parameter set reconfigured (2015 08 21)
-        - Ver 1.1000   : Antenna array alignments can be configured (2015 03 23)
-        - Ver 1.1100   : Reformatted source code (2017 04 11)
-        - Ver 1.2000   : Array factor calculation based on antenna positions (2017 04 21) 
-        - Ver 1.2001   : Improved documentation and comments (2018 02 16) 	
-        - Ver 1.3000   : Single element pattern for the individual antenna elements (2018 10 23) 
 """
 
 
