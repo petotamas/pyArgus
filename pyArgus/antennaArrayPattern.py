@@ -12,7 +12,19 @@ import matplotlib.pyplot as plt
 
 
     Authors: Pető Tamás
+
     License: GPLv3
+
+    Changelog :
+        - Ver 1.0000   : Initial version (2015 07 13)
+        - Ver 1.0100   : Weight coefficients can be set externally (2015 08 07)
+        - Ver 1.0200   : Input parameter set reconfigured (2015 08 21)
+        - Ver 1.1000   : Antenna array alignments can be configured (2015 03 23)
+        - Ver 1.1100   : Reformatted source code (2017 04 11)
+        - Ver 1.2000   : Array factor calculation based on antenna positions (2017 04 21) 
+        - Ver 1.2001   : Improved documentation and comments (2018 02 16) 	
+        - Ver 1.3000   : Single element pattern for the individual antenna elements (2018 10 23) 
+        - Ver 1.400    : Fix scaling [N. Baranyai] (2021 05 17)
 """
 
 
@@ -40,20 +52,19 @@ def array_rad_pattern_plot(array_alignment, w=None, sing_elem_patterns=None, axe
         Parameters:
         -----------          
              
-             :param array_alignment : Contains the positions of the antenna elements in a two dimensional numpy array. 
-             :param axes : Specify when the radiation pattern is requested to plot on the given axes.
-             :param w : Complex valued weight coefficients (default : 1 1 ... 1)
-             :param log_scale_min : Minimum plot value in logarithmic scale. (default value is -50 dB)
+             :param array_alignment   : Contains the positions of the antenna elements in a two dimensional numpy array. 
+             :param axes              : Specify when the radiation pattern is requested to plot on the given axes.
+             :param w                 : Complex valued weight coefficients (default : 1 1 ... 1)
+             :param log_scale_min     : Minimum plot value in logarithmic scale. (default value is -50 dB)
              :param sing_elem_pattern : (numpy array) Single antenna element radiation pattern [dBi-deg array] (default : 0...0)
                                        This radiation pattern must be contain data values in a range of 0 -180 deg.
 
-
-    	     :type array_alignment : 2D numpy array.The first row stores the "x", while the second row stores the "y" 
-    				     coordinates of the antenna elements. The distance unit is lambda, where lambda 
-    				     is the center wavelength of the processed signal.
-    	     :type axes : matplotlib generated figure axes object. 
-    	     :type w : complex numpy array. Its dimension should be equal with the number of antenna elements.
-    	     :type log_scale_min : float	
+    	     :type array_alignment   : 2D numpy array.The first row stores the "x", while the second row stores the "y" 
+                    				   coordinates of the antenna elements. The distance unit is lambda, where lambda 
+                                       r wavelength of the processed signal.
+    	     :type axes              : matplotlib generated figure axes object. 
+    	     :type w                 : complex numpy array. Its dimension should be equal with the number of antenna elements.
+    	     :type log_scale_min     : float	
     	     :type sing_elem_pattern : numpy array
  	
        Return values:
@@ -63,8 +74,7 @@ def array_rad_pattern_plot(array_alignment, w=None, sing_elem_patterns=None, axe
             :rype pattern_theta : numpy array	
     """
 
-    # --- Plot parameters ---
-
+    # --- Plot parameters ---        
     # (These parameters are not configurable externally)        
     angle_resolution = 0.1  # [deg]
     angle_range = 360  # 180 or 360 [deg]
@@ -103,15 +113,16 @@ def array_rad_pattern_plot(array_alignment, w=None, sing_elem_patterns=None, axe
         s_theta = np.exp(-1j * 2 * np.pi * r_abs)  # steering vector
         
         # Apply single element pattern
-        s_theta *= 10**(sing_elem_patterns[:, theta_index]/10)        
+        s_theta *= 10**(sing_elem_patterns[:, theta_index]/20)        
         
         # Applying weight coefficients
         AF[theta_index] = np.inner(np.conjugate(w), s_theta) # Array Factor
         theta_index += 1
     
     # --- Display ---
-    #AF = np.divide(AF,np.max(np.abs(AF)))  # normalization
-    AF_log = 20*np.log10(abs(AF))
+    #AF = np.divide(AF,np.max(np.abs(AF)))  # normalization    
+    AF_log  = 20*np.log10(abs(AF))
+    AF_log -= 10*np.log10(np.sum(np.abs(w)))
     theta_index = 0
     for theta in incident_angles:
         if AF_log[theta_index] < log_scale_min:
@@ -128,3 +139,5 @@ def array_rad_pattern_plot(array_alignment, w=None, sing_elem_patterns=None, axe
     axes.set_ylabel("Amplitude [dBi]")
     
     return AF_log
+
+
