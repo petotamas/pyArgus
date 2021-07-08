@@ -54,6 +54,6 @@ pip install pyargus
 
 Personal website: [tamaspeto.com](https://www.tamaspeto.com/pyargus) 
 
-Tamás Pető 2016-2019, Hungary
+Tamás Pető 2016-2021, Hungary
 
 
