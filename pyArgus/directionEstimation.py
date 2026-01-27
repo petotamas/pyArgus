@@ -295,19 +295,19 @@ def DOA_LPM(R, scanning_vectors, element_select, angle_resolution = 1):
         print("ERROR: Signular matrix")
         return -3, -3
 
-    R_inv = np.matrix(R_inv)
+    R_inv = np.array(R_inv)
     M = np.size(scanning_vectors,0)
     
     # Create element selector vector
     u = np.zeros(M,dtype=complex)
     u[element_select] = 1
-    u = np.matrix(u).getT()        
+    u = np.array(u).T       
     
     theta_index=0
     for i in range(np.size(scanning_vectors,1)):             
         S_theta_ = scanning_vectors[:, i]
-        S_theta_ = np.matrix(S_theta_).getT() 
-        PLP[theta_index]=  np.real(u.getH() * R_inv * u) / np.abs(u.getH()* R_inv * S_theta_)**2            
+        S_theta_ = np.array(S_theta_).T
+        PLP[theta_index]=  np.real(np.conj(u.T) @ R_inv @ u) / np.abs(np.conj(u.T)@ R_inv @ S_theta_)**2            
         theta_index += 1   
  
     return PLP
@@ -380,13 +380,13 @@ def DOA_MUSIC(R, scanning_vectors, signal_dimension, angle_resolution = 1):
     for i in range(noise_dimension):     
         E[:,i] = eig_array[i][1]     
         
-    E = np.matrix(E)    
+    E = np.array(E)    
     
     theta_index=0
     for i in range(np.size(scanning_vectors, 1)):             
         S_theta_ = scanning_vectors[:, i]
-        S_theta_  = np.matrix(S_theta_).getT() 
-        ADORT[theta_index]=  1/np.abs(S_theta_.getH()*(E*E.getH())*S_theta_)
+        S_theta_  = np.array(S_theta_).T
+        ADORT[theta_index]=  1/np.abs(np.conj(S_theta_.T)@(E@np.conj(E.T))@S_theta_)
         theta_index += 1
          
     return ADORT
@@ -478,7 +478,7 @@ def DOAMD_MUSIC(R, array_alignment, signal_dimension, coherent_sources=2, angle_
     for i in range(noise_dimension):     
         E[:,i] = eig_array[i][1]
            
-    E = np.matrix(E)   
+    E = np.array(E)   
     
     theta_index  = 0
     theta2_index = 0
@@ -489,8 +489,8 @@ def DOAMD_MUSIC(R, array_alignment, signal_dimension, coherent_sources=2, angle_
         theta2_index=0
         for theta2 in incident_angles[0:theta_index]:            
             S_theta_2_ = np.exp(array_alignment*1j*2*np.pi*np.cos(np.radians(theta2))) # Scanning vector                                  
-            a = np.matrix(S_theta_+S_theta_2_).getT() # Spatial signiture vector
-            ADORT[theta_index,theta2_index]=  np.real(1/np.abs(a.getH()*(E*E.getH())*a))            
+            a = np.array(S_theta_+S_theta_2_).T # Spatial signiture vector
+            ADORT[theta_index,theta2_index]=  np.real(1/np.abs(np.conj(a.T)@(E@np.conj(E.T))@a))            
             theta2_index += 1
         theta_index += 1
     
@@ -637,14 +637,14 @@ def forward_backward_avg(R):
     
     # --> Calculation
     M = np.size(R, 0)  # Number of antenna elements
-    R = np.matrix(R)
+    R = np.array(R)
 
     # Create exchange matrix
     J = np.eye(M)
     J = np.fliplr(J) 
-    J = np.matrix(J)
+    J = np.array(J)
     
-    R_fb = 0.5 * (R + J*np.conjugate(R)*J)
+    R_fb = 0.5 * (R + J@np.conjugate(R)@J)
 
     return np.array(R_fb)
          

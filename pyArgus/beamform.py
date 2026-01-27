@@ -80,11 +80,10 @@ def fixed_max_sir_beamform(angles, constraints, array_alignment):
         A[:, k] = np.exp(array_alignment*1j*2*np.pi*np.cos(np.deg2rad(angles[k])))
     print(A)
     # Calculate coefficient vector
-    A = np.matrix(A) # convert to matrix
-    u = np.matrix(constraints) # convert to vector
-    A_inv = A.getI() # invert A matrix
-    w_max_sir = (u.getT() * A_inv).getH() # solve linear equation
-    w_max_sir = w_max_sir.getA()[:,0]  # conver to numpy array
+    A = np.array(A) # convert to matrix
+    u = np.array(constraints) # convert to vector
+    A_inv = lin.inv(A) # invert A matrix
+    w_max_sir = np.conj((u.T @ A_inv).T) # solve linear equation
 
     return w_max_sir
 
@@ -131,20 +130,20 @@ def Goadar_max_sir_beamform(angles, U, array_alignment):
     for k in range(noc):        
         A[:, k] = np.exp(array_alignment*1j*2*np.pi*np.cos(np.deg2rad(angles[k])))
        
-    A = np.matrix(A) # Change to matrix object
-    U = np.matrix(U) # Change to matrix object
+    A = np.array(A) # Change to matrix object
+    U = np.array(U) # Change to matrix object
     
-    I = np.matrix(np.eye(N)) # Identity matrix
+    I = np.array(np.eye(N)) # Identity matrix
     
     sigmaN2 = 0.001
-    aux    = (A*A.getH() + sigmaN2 * I)
-    aux_inv = aux.getI()
+    aux    = (A@np.conj(A.T) + sigmaN2 * I)
+    aux_inv = lin.inv(aux)
     
-    w_Godara_maxsir = U*(A.getH() * aux_inv)
+    w_Godara_maxsir = U@(np.conj(A.T) @ aux_inv)
     
-    w_Godara_maxsir = w_Godara_maxsir.getH()
+    w_Godara_maxsir = np.conj(w_Godara_maxsir.T)
 
-    return w_Godara_maxsir.getA()[:,0]
+    return w_Godara_maxsir
     
 
 
@@ -180,11 +179,11 @@ def MSINR_beamform(Rss,Rnunu,aS = None):
     # -- Calculation --    
         
     # Convert input arrays to matrix form    
-    Rss =  np.matrix(Rss)  
-    Rnunu =  np.matrix(Rnunu)  
+    Rss =  np.array(Rss)  
+    Rnunu =  np.array(Rnunu)  
     
     # Calcaulating product matrix
-    prodMatrix = Rnunu.getI() * Rss
+    prodMatrix = lin.inv(Rnunu) @ Rss
     
     #calcaulte eigenvectors and eigenvalues
     w,v = np.linalg.eig(prodMatrix)
@@ -195,7 +194,7 @@ def MSINR_beamform(Rss,Rnunu,aS = None):
     # eigenvector belongs to the maximum eigenvalue is equal to the optimal solution
     w_msinr = v[:,np.argmax(np.abs(w))]
        
-    return maxEigenVal, w_msinr.getA()[:,0]
+    return maxEigenVal, w_msinr
         
     
 
@@ -252,14 +251,14 @@ def optimal_Wiener_beamform(Rnunu, aS):
     
     # -- Calculation --    
     # Change Rnunu array to matrix form
-    Rnunu = np.matrix(Rnunu) # noise+interference autocorrelation matrix
+    Rnunu = np.array(Rnunu) # noise+interference autocorrelation matrix
     
     # Change array response vector to matrix form
-    aS =  np.matrix(aS)
+    aS =  np.array(aS)
     
-    w_msinr = Rnunu.getI() * aS    
+    w_msinr = lin.inv(Rnunu) @ aS    
 
-    return w_msinr.getA()[:,0]
+    return w_msinr
 
 
 def MMSE_beamform(received_signal, desired_signal):
@@ -366,12 +365,12 @@ def peigen_bemform(Rnunu, aS, peigs):
     
     # -- Calculation --    
     # Change Rnunu array to matrix form
-    Rnunu = np.matrix(Rnunu) # noise+interference autocorrelation matrix
+    Rnunu = np.array(Rnunu) # noise+interference autocorrelation matrix
     
     # Change array response vector to matrix form
-    aS =  np.matrix(aS)
+    aS =  np.array(aS)
     
-    I = np.matrix(np.eye(M))
+    I = np.array(np.eye(M))
     
     # Determine eigenvectors and eigenvalues
     sigmai, vi = lin.eig(Rnunu)
@@ -384,13 +383,13 @@ def peigen_bemform(Rnunu, aS, peigs):
     
     # Generate clutter subspace matrix
     clutter_dim = peigs
-    q = np.matrix(np.zeros((M, clutter_dim),dtype=complex))
+    q = np.array(np.zeros((M, clutter_dim),dtype=complex))
     for i in range(clutter_dim):             
         q[:,i] = eig_array[i][1]    
     
-    w_pe = (I-q*q.getH()) * aS  # Noise subspace
+    w_pe = (I-q@np.conj(q.T)) @ aS  # Noise subspace
     
-    return w_pe.getA()[:, 0]
+    return w_pe
     
 def estimate_corr_matrix(X, imp="mem_eff"):
     """
